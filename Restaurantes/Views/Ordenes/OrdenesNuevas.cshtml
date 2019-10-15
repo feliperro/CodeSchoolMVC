@@ -1,0 +1,70 @@
+﻿@model OrdenViewModel
+<h1>
+    Nueva Orden 
+    
+</h1>
+<form id="productForm">
+    <table style="width:100%" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var prod in Model.ListaProductos)
+            {
+                <tr class="rowProducto">
+                    <td class="idProductoCell">@prod.Id</td>
+                    <td class="idNombreCell">@prod.Nombre</td>
+                    <td class="idPrecioCell">@prod.Precio</td>
+                    <td><input class="idCantidadCell" value="0" min="0" type="number"></td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+</form>
+<button type="submit" onclick="newOrder()" value="Submit">Submit</button>
+
+
+@section Scripts{
+    <script>
+        var ordenId = @Model.Id;
+        console.log("id "+@Model.Id);
+        var resId = @Model.RestauranteId;
+        console.log("resid "+@Model.RestauranteId);
+        function newOrder() {
+            var rows = $(".rowProducto");
+            var productos = [];
+            $.map(rows, function (p) {
+                var cantidad = $(p).find(".idCantidadCell").val();
+                if (cantidad > 0) {
+                    var prodId = $(p).find(".idProductoCell").text();
+                    var newProd = {};
+                    newProd.cantidad = cantidad;
+                    newProd.productoId = prodId;
+                    productos.push(newProd);
+                }
+            });
+                var ord = {};
+                ord.Id = ordenId;
+                ord.ResId = resId;
+                ord.Productos = productos;
+
+            $.post("/api/ordenes/AgregarOrden", { orden: JSON.stringify(ord) }, function (x) {
+                ordenId = x;
+            })
+        window.location.href='@Url.Action("Index","Ordenes")/Index/' + @ViewData["id"];
+            
+        }
+
+        window.onload = function () {
+            console.log(@ViewData["id"]);
+    }
+    </script>
+}

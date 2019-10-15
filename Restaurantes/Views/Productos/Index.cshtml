@@ -1,0 +1,264 @@
+﻿@model int
+
+<h1>
+    Productos
+</h1>
+
+<a class="btn btn-primary" style="color:white;" onclick="MostrarAgregar()">Agregar producto</a>
+
+<table class="table table-bordered" id="tabla-productos-contenido">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-productos">
+
+        </tbody>
+</table>
+
+
+
+<!-- Modal Par a Agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalCuerpo">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="GuardarRestaurant()">Gruardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!---Modal Para Editars-->
+<div class="modal fade" id="editarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Editar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalEditarCuerpo">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnEditarModal" data-dismiss>Guardar editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+    //window.onload = function () {
+    //    console.log("STARTSSSS");
+        //document.getElementById("btnEditarModal").addEventListener("click", function () {
+        //    EditarRestaurant();
+        //})
+   
+        // }
+
+     function EditarRestaurant() {
+
+            var Nombre = document.getElementById("Nombre").value;
+            var Cantidad = document.getElementById("Cantidad").value;
+            var Precio = document.getElementById("Precio").value;
+
+            var fd = {};
+
+            fd["Nombre"] = Nombre;
+            fd["Cantidad"] = Cantidad;
+            fd["Precio"] = Precio;
+
+
+
+        fetch("/Api/Productos/" + Id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(fd)
+         }).then(function (response) {
+            if (response.ok) {
+                $("#editarModal").modal("hide");
+                table.ajax.reload(AddListeners);
+
+            }
+        });
+
+        }
+
+        function AddListeners() {
+            console.log("EDITTTTTTTTTTTTTT");
+            var buttons = document.getElementsByClassName("editar-restaurant");
+            
+                    for (i = 0; i < buttons.length; i++) {
+                        buttons[i].addEventListener("click", function () {
+                            MostrarEditar(this.dataset.id)
+                        })
+                    }
+        }
+
+        function MostrarAgregar() {
+            
+            var req = new XMLHttpRequest();
+            req.open("GET", "@Url.Action("Agregar", "Productos")", true);
+            req.send();
+
+            req.onreadystatechange = function () {
+                if (req.status == 200) {
+                    document.getElementById("modalCuerpo").innerHTML = req.responseText;
+                     $("#agregarModal").modal("show");
+                }
+            }
+
+       function MostrarEditar(id) {
+
+       fetch(`@Url.Action("Editar","Productos")/${id}`, {
+            method: "GET"
+         }).then(function (response) {
+            if (response.ok) {
+                response.text().then(function (text) {
+                    LimpiarModales()
+                    document.getElementById("modalEditarCuerpo").innerHTML = text;
+                    $("#editarModal").modal("show");//JQUERY
+
+                })
+            }
+        });
+        }
+
+        function LimpiarModales() {
+
+        var bodies = document.getElementsByClassName("modal-body");
+
+            for (i = 0; i < bodies.length; i++) {
+                    bodies[i].innerHTML = ""
+            }
+        }
+
+
+
+
+        }
+
+
+        //function GuardarRestaurant() {}
+        function GuardarRestaurant() {
+            console.log("yoooooooooooooooo");
+            var RestauranteId = @ViewData["id"];
+            var Nombre = document.getElementById("Nombre").value;
+            var Cantidad = document.getElementById("Cantidad").value;
+            var Precio = document.getElementById("Precio").value;
+
+            var fd = {};
+            fd["RestauranteId"] = RestauranteId;
+            fd["Nombre"] = Nombre;
+            fd["Cantidad"] = Cantidad;
+            fd["Precio"] = Precio;
+
+            fetch("/Api/Productos/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(fd)
+            }).then(function (response) {
+                if (response.ok) {
+                    console.log("ESTUVE AQUI SIIIIIIIII");
+                    $("#agregarModal").modal("hide");
+                    table.ajax.reload();
+                }
+            });
+
+        }
+
+
+
+
+
+        
+        console.log("test");
+
+  var table;
+        $(document).ready(function () {
+            table = $('#tabla-productos-contenido').DataTable({
+                "initComplete": function () {
+                    AddListeners();
+                    console.log("hehehe");
+            },
+                ajax: {
+                url: '/api/productos/' + @ViewData["id"],
+                    dataSrc: ''
+            },
+            columns: [
+                {data: 'id'},
+                {data: 'nombre'},
+                { data: 'cantidad' },
+                {data: 'precio'}
+                
+            ],
+            select: true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'excel', 'pdf',
+                {
+                    text: 'Eliminar',
+                    action: function () {
+
+                        var rows = table.rows({ selected: true }).data();
+                        var ids = [];
+                        for (var x = 0; x < rows.length; x++) {
+                            ids.push(rows[x].id)
+                        }
+                        //
+                         bootbox.confirm("Deseas eliminar este elemento?", function (IsConfirmed) {
+                             if (IsConfirmed) {
+                                 console.log(ids.toString());
+                                 // eliminar elemento
+                                  $.ajax({
+                                        contentType: 'application/json',
+                                        url: '/api/productos/',
+
+                                        data: '[' + ids.toString() + ']',
+                                     type: 'DELETE',
+                                        success: () => {
+                                            table.ajax.reload();
+                                        }
+                                    });
+
+                            }
+                        });
+                        //
+
+                        console.log(ids);
+                    }
+                }
+            ]
+        });
+
+
+        //table.buttons().container()
+        //    .appendTo($('.col-sm-6:eq(0)', table.table().container()));
+
+    } ); 
+    </script>
+}
+

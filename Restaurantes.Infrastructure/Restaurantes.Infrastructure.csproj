@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190930185158_productos.cs" />
+    <Compile Remove="Migrations\20190930185158_productos.Designer.cs" />
+    <Compile Remove="Migrations\20190930190259_productos.cs" />
+    <Compile Remove="Migrations\20190930190259_productos.Designer.cs" />
+    <Compile Remove="Migrations\20191007183032_prod2.cs" />
+    <Compile Remove="Migrations\20191007183032_prod2.Designer.cs" />
+    <Compile Remove="Migrations\20191007211815_prod3.cs" />
+    <Compile Remove="Migrations\20191007211815_prod3.Designer.cs" />
+    <Compile Remove="Migrations\20191007212238_prod4.cs" />
+    <Compile Remove="Migrations\20191007212238_prod4.Designer.cs" />
+    <Compile Remove="Migrations\20191007212635_pr5.cs" />
+    <Compile Remove="Migrations\20191007212635_pr5.Designer.cs" />
+    <Compile Remove="Migrations\20191007213940_p.cs" />
+    <Compile Remove="Migrations\20191007213940_p.Designer.cs" />
+    <Compile Remove="Migrations\20191007220230_z.cs" />
+    <Compile Remove="Migrations\20191007220230_z.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.4" PrivateAssets="all">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Restaurantes.Core\Restaurantes.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,309 @@
+﻿@model List<Restaurante>
+
+<h1>
+    Restaurantes
+</h1>
+
+<a class="btn btn-primary" style="color:white;" onclick="MostrarAgregar()">Agregar restaurante</a>
+
+<table class="table table-bordered" id="tabla-restaurantes-contenido">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Logo</th>
+                <th>Nombre</th>
+                <th>Domicilio</th>
+                <th>Teléfono</th>
+                <th>Ordenes</th>
+                <th>Productos</th>
+                <th>Editar</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-restaurantes">
+
+        </tbody>
+</table>
+
+
+
+<!-- Modal Par a Agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Agregar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalCuerpo">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="GuardarRestaurant()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!---Modal Para Editars-->
+<div class="modal fade" id="editarModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Editar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalEditarCuerpo">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnEditarModal" data-dismiss>Guardar editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+    window.onload = function () {
+        
+        document.getElementById("btnEditarModal").addEventListener("click", function () {
+            EditarRestaurant();
+        })
+    }
+
+
+     function EditarRestaurant() {
+
+        var Nombre = document.getElementById("Nombre").value;
+        var Domicilio = document.getElementById("Domicilio").value;
+        var Telefono = document.getElementById("Telefono").value;
+        var Logo = document.getElementById("Logo").value;
+        var PaginaWeb = document.getElementById("PaginaWeb").value;
+        var HoraDeCierre = document.getElementById("HoraDeCierre").value;
+        var Id = document.getElementById("Id").value;
+
+        var fd = {};
+
+        fd["Nombre"] = Nombre;
+        fd["Domicilio"] = Domicilio;
+        fd["Telefono"] = Telefono;
+        fd["Logo"] = Logo;
+        fd["PaginaWeb"] = PaginaWeb;
+        fd["HoraDeCierre"] = HoraDeCierre;
+        fd["Id"] = Id;
+
+
+        fetch("/Api/Restaurantes/" + Id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(fd)
+         }).then(function (response) {
+            if (response.ok) {
+                $("#editarModal").modal("hide");
+                table.ajax.reload(AddListeners);
+
+            }
+        });
+
+        }
+
+        function AddListeners() {
+            console.log("EDITTTTTTTTTTTTTT");
+            var buttons = document.getElementsByClassName("editar-restaurant");
+            
+                    for (i = 0; i < buttons.length; i++) {
+                        buttons[i].addEventListener("click", function () {
+                            MostrarEditar(this.dataset.id)
+                        })
+                    }
+        }
+
+       function MostrarEditar(id) {
+
+       fetch(`@Url.Action("Editar", "Home")/${id}`, {
+            method: "GET"
+         }).then(function (response) {
+            if (response.ok) {
+                response.text().then(function (text) {
+                    LimpiarModales()
+                    document.getElementById("modalEditarCuerpo").innerHTML = text;
+                    $("#editarModal").modal("show");
+
+                })
+            }
+        });
+        }
+
+        function LimpiarModales() {
+
+        var bodies = document.getElementsByClassName("modal-body");
+
+            for (i = 0; i < bodies.length; i++) {
+                    bodies[i].innerHTML = ""
+            }
+        }
+
+        function MostrarAgregar() {
+            
+            var req = new XMLHttpRequest();
+            req.open("GET", "@Url.Action("Agregar", "Home")", true);
+            req.send();
+
+            req.onreadystatechange = function () {
+                if (req.status == 200) {
+                    document.getElementById("modalCuerpo").innerHTML = req.responseText;
+                     $("#agregarModal").modal("show");
+                }
+            }
+
+
+
+        }
+
+
+        //function GuardarRestaurant() {}
+        function GuardarRestaurant() {
+
+            var Nombre = document.getElementById("Nombre").value;
+            var Domicilio = document.getElementById("Domicilio").value;
+            var Telefono = document.getElementById("Telefono").value;
+            var Logo = document.getElementById("Logo").value;
+            var PaginaWeb = document.getElementById("PaginaWeb").value;
+            var HoraDeCierre = document.getElementById("HoraDeCierre").value;
+
+            var fd = {};
+
+            fd["Nombre"] = Nombre;
+            fd["Domicilio"] = Domicilio;
+            fd["Telefono"] = Telefono;
+            fd["Logo"] = Logo;
+            fd["PaginaWeb"] = PaginaWeb;
+            fd["HoraDeCierre"] = HoraDeCierre;
+
+            fetch("/Api/Restaurantes/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(fd)
+            }).then(function (response) {
+                if (response.ok) {
+                    $("#agregarModal").modal("hide");
+                    table.ajax.reload();
+                }
+            });
+
+        }
+
+
+  var table;
+        $(document).ready(function () {
+            table = $('#tabla-restaurantes-contenido').DataTable({
+                "initComplete": function () {
+                    AddListeners();
+                },
+                ajax: {
+                    url: '/api/restaurantes',
+                    dataSrc: ''
+
+                },
+                columns: [
+                    { data: 'id' },
+                    {
+                        data: 'logo',
+                        render: (data, type, row) => {
+                            return '<img src="' + data +'"  height="42" width="42">'
+                        }
+
+                    },
+                    { data: 'nombre' },
+                    { data: 'domicilio' },
+                    { data: 'telefono' },
+
+               
+                    {
+                        data: 'ordenes',
+                        render: (data, type, row) => {
+                            
+                            return '<a class="btn btn-link" href="@Url.Action("Index","Ordenes")/Index/' + row.id + '">' + 'Ver Ordenes' + '</a>'; 
+
+                        }
+                    },
+
+                    {
+                        data: 'productos',
+                        render: (data, type, row) => {
+                            
+                            return '<a class="btn btn-link" href="@Url.Action("Index","Productos")/Index/' + row.id + '">' + 'Ver Productos' + '</a>'; 
+
+                        }
+                    },
+
+                    @*{
+                        data: 'mesas',
+                        render: (data, type, row) => {
+                            
+                            return '<a class="btn btn-link" href="@Url.Action("Index","Mesas")/Index/' + row.id + '">' + 'Ver Mesas' + '</a>'; 
+
+                        }
+                    },*@
+
+                    {
+                         
+                        render: (data, type, row) => {
+                            return `<button class="btn btn-dark editar-restaurant" style="color:white" data-id="${row.id}">Editar</button>`
+                        }
+                    },
+
+
+                ],
+                select: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf',
+                    {
+                        text: 'Eliminar',
+                        action: function () {
+
+                            var rows = table.rows({ selected: true }).data();
+                            var ids = [];
+                            for (var x = 0; x < rows.length; x++) {
+                                ids.push(rows[x].id)
+                            }
+                            //
+                            bootbox.confirm("Deseas eliminar este elemento?", function (IsConfirmed) {
+                                if (IsConfirmed) {
+                                    console.log(ids.toString());
+                                    // eliminar elemento
+                                    $.ajax({
+                                        contentType: 'application/json',
+                                        url: '/api/restaurantes/',
+
+                                        data: '[' + ids.toString() + ']',
+                                        type: 'DELETE',
+                                        success: () => {
+                                            table.ajax.reload();
+                                        }
+                                    });
+
+                                }
+                            });
+
+                        }
+                    }
+                ]
+            });
+
+        });
+
+    </script>
+}

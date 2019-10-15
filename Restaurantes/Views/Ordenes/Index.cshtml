@@ -1,0 +1,72 @@
+﻿@model int
+<a class="btn btn-primary" style="color:white;" onclick="location.href=url">Nueva orden</a>
+<a style="color:white;" href="">Agregar orden</a>
+
+<table class="table table-bordered" id="tabla-mesas-contenido">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Estatus</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody id="tabla-mesas">
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+        var url = '@Url.Action("New", "Ordenes")/' + @ViewData["id"];
+        window.onload = function () {
+
+    }
+
+    var table;
+        $(document).ready(function () {
+            console.log(@ViewData["id"]);
+        table = $('#tabla-mesas-contenido').DataTable({
+            ajax: {
+                url: '/api/ordenes',
+                dataSrc: '',
+                data: {
+                    "id": "@ViewData["id"]"
+                    
+                }
+            },
+            columns: [
+                { data: 'id' },
+                {
+                data: 'fechaAlta',
+                    render: function (data, type, row) {
+                        var x = new Date(data);
+                        return x.getDate() + "-" + x.getMonth() + "-" + x.getFullYear();
+                    }
+                },
+                {
+                data: 'fechaAlta',
+                    render: function (data, type, row) {
+                        var t = new Date(data);
+                        return t.getHours() + ":" + String(t.getMinutes()).padStart(2, '0');
+                    }
+                },
+                {
+                    data: 'estatus',
+                    render: function (data, type, row) {
+                        if (data == 1) { return "Abierta" }
+                        else { return "Cerrada" };
+                    }
+                },
+                {
+                    data: 'total',
+                    render: function (data, type, row) {
+                        return "$"+data+".00";}
+                }
+            ],
+            select: true
+        }
+            )
+    } );
+    </script>
+}
